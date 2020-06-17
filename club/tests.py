@@ -1,6 +1,8 @@
 from django.test import TestCase
+from django.test import Client
 from .models import Meeting, MeetingMinutes, Resource, Event
-from .views import index, getResources, getMeetings, meetingDetails
+from .forms import MeetingForm, ResourceForm
+from .views import index, getResources, getMeetings, meetingDetails, newResource, newMeeting
 from django.urls import reverse
 from django.contrib.auth.models import User
 
@@ -107,3 +109,16 @@ class New_Resource_authentication_test(TestCase):
         self.assertEqual(str(response.context["user"]), "testuser1")
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "club/newresource.html")
+
+
+class New_Meeting_Form_test(TestCase):
+    def setUp(self):
+        self.test_user = User.objects.create_user(username="testuser1", password="P@ssw0rd1")
+
+    def test_UserForm_valid(self):
+        form = MeetingForm(data={'meetingTitle': 'we love python', 'meetingDate': '2019-04-02', 'meetingTime': '14:00:00', 'meetingLocation': 'Room 3', 'meetingAgenda': 'meeting agenda placeholder'})
+        self.assertTrue(form.is_valid())
+
+    def test_UserForm_invalid(self):
+        form = MeetingForm(data={'meetingTitle': '', 'meetingDate': '', 'meetingTime': '', 'meetingLocation': '', 'meetingAgenda': ''})
+        self.assertFalse(form.is_valid())
